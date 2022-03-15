@@ -16,9 +16,14 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     FILE *fp;
     char buff[255];
 
+    if (filename == NULL){
+        printf("Provide filename.\n");
+        exit(1);
+    }
+
     fp = fopen(filename, "r");      // opening the txt-file
 
-    // reading the first two lines of the txt-file
+    // reading/skipping the first two lines of the txt-file
     fgets(buff, 255, (FILE*)fp);
     fgets(buff, 255, (FILE*)fp);
 
@@ -28,7 +33,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     printf("Number of links: %d\n", links);
 
 
-    // reading the 4th line in the txt-file. didnt find out how to do this without assigning chars
+    // tried to skip the 4th line in the txt-file. didnt find out how to do this without assigning chars
     char text1[15], text2[15];
     fscanf(fp, "%*s %s %s", text1, text2);
 
@@ -37,6 +42,8 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     int *temp_col = (int*)calloc(links, sizeof(int));
     int *temp_row = (int*)calloc(links, sizeof(int));
 
+
+    // extracting the values needed from the txt.file
     int outgoing_links, ingoing_links, self_links;
     self_links = 0;
     for (int i = 0; i < links; i++){
@@ -75,6 +82,8 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
 
     int *row_idx = (int*)calloc(links, sizeof(int));        // array with ingoing links needed for sorting
 
+    // adding the values to col_idx and row_idx before sorting
+
     for (int i = 0; i < links; i++){
         (*col_idx)[i] = temp_col[i];
         row_idx[i] = temp_row[i];
@@ -102,7 +111,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
         
     }
 
-    // printing col_idx to check if it is in the right order
+    // printing col_idx to check if it is in the right order. now they are in the wrong order (but better than initially:))
     for (int i = 0; i < links; i++){
         printf("col_idx: %d\n", (*col_idx)[i]);
     }
