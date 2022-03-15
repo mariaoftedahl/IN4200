@@ -32,10 +32,10 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     char text1[15], text2[15];
     fscanf(fp, "%*s %s %s", text1, text2);
 
-    // allocating some temporary array
+    // allocating some temporary arrays
     int *row_count = (int*)calloc(*N, sizeof(int));
-    int *tmp_col = (int*)calloc(links, sizeof(int));
-    int *tmp_row = (int*)calloc(links, sizeof(int));
+    int *temp_col = (int*)calloc(links, sizeof(int));
+    int *temp_row = (int*)calloc(links, sizeof(int));
 
     int outgoing_links, ingoing_links, self_links;
     self_links = 0;
@@ -43,8 +43,8 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
         fscanf(fp, "%d %d", &outgoing_links, &ingoing_links);
         if (outgoing_links != ingoing_links){
             row_count[ingoing_links+1]++;               // needed for row_ptr
-            tmp_col[i] = outgoing_links;                // needed for col_idx
-            tmp_row[i] = ingoing_links;                 // needed for val
+            temp_col[i] = outgoing_links;                // needed for col_idx
+            temp_row[i] = ingoing_links;                 // needed for val
             
         }
         else{
@@ -76,8 +76,8 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     int *row_idx = (int*)calloc(links, sizeof(int));        // array with ingoing links needed for sorting
 
     for (int i = 0; i < links; i++){
-        (*col_idx)[i] = tmp_col[i];
-        row_idx[i] = tmp_row[i];
+        (*col_idx)[i] = temp_col[i];
+        row_idx[i] = temp_row[i];
     }
 
     /* 
@@ -102,6 +102,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
         
     }
 
+    // printing col_idx to check if it is in the right order
     for (int i = 0; i < links; i++){
         printf("col_idx: %d\n", (*col_idx)[i]);
     }
