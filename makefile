@@ -5,3 +5,4 @@ compile:
 
 run:
 	./a.out simple_webgraph.txt
+
