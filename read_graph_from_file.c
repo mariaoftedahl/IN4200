@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 
-
-
 #include "methods.h"
 
 /*
@@ -36,8 +34,8 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
 
     // extracting the number of webpages (nodes)
     fscanf(fp, "%*s %*s %d %*s %d", N, &links);
-    //printf("Number of nodes: %d\n", *N);
-    //printf("Number of links: %d\n", links);
+    printf("Number of nodes: %d\n", *N);
+    printf("Number of links: %d\n", links);
 
 
     // tried to skip the 4th line in the txt-file. didnt find out how to do this without assigning chars
@@ -51,64 +49,100 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     int *temp_row = (int*)calloc(links, sizeof(int));
     int *temp = (int*)calloc(*N, sizeof(int));
 
+    // allocating row_ptr, col_idx and val
+    *row_ptr = (int*)calloc(*N+1, sizeof(int*));
+    *col_idx = (int*)calloc(links, sizeof(int*));
+    *val = (double*)calloc(links, sizeof(double*));
 
+    
     // extracting the values needed from the txt.file
     int outgoing_links, ingoing_links, self_links;
     self_links = 0;
+
     for (int i; i < *N; i++){
         temp[i] = 0;
     }
+    
     for (int i = 0; i < links; i++){
         fscanf(fp, "%d %d", &outgoing_links, &ingoing_links);
+        
         if (outgoing_links != ingoing_links){
             temp[outgoing_links]++;
             row_count[ingoing_links+1]++;               // needed for row_ptr
             col_count[outgoing_links]++;
             temp_col[i - self_links] = outgoing_links;                // needed for col_idx
-            temp_row[i - self_links] = ingoing_links;                 // needed for val
+            temp_row[i - self_links] = ingoing_links;                 // needed for val 
             
         }
         else{
             self_links++;
         }
-
+    
     }
+
     fclose(fp);  // closing the file
 
+    printf("Self links: %d\n", self_links);
 
-    // allocating row_ptr, col_idx and val
+    links -= self_links;        // update number of links, subtracting if there are self-links
 
-    *row_ptr = (int*)calloc(*N+1, sizeof(int*));
-    *col_idx = (int*)calloc(links, sizeof(int*));
-    *val = (double*)calloc(links, sizeof(double*));
+    printf("Updated number of links: %d\n", links);
+
+    // find number of dangling webpages
+    
+    int d_count = 0;
+    for (int i = 0; i < *N; i++){
+        if(col_count[i] == 0){
+            d_count++;
+        }
+    }
+
+    if(d_count > 0){
+        printf("Number of dangling webpages: %d\n", d_count);
+    } else{
+        printf("No dangling webpages.\n");
+    }
+
+    int *D = (int*)calloc(d_count, sizeof(int));
+
+    if(d_count > 0){
+        int idx_count = 0;
+        for (int i = 0; i < *N; i++){
+            if (col_count[i] == 0){
+            D[idx_count] = i;
+            idx_count++;
+            }
+        }
+    }
+
+    printvec_i(D, d_count);
 
     // filling row_ptr
-
+    
     int count = 0;
 
     for (int i = 0; i < *N+1; i++){
         count += row_count[i];
         (*row_ptr)[i] = count;
     }
-
-    links -= self_links;        // update number of links, subtracting if there are self-links
     
     sort_inplace(temp_row, temp_col, links);
-    for (size_t i = 0; i < *N; i++) {
+    
+    for (int i = 0; i < *N; i++) {
         start = (*row_ptr)[i], stop = (*row_ptr)[i+1];
-        sort_inplace(&(temp_col[start]), &(temp_row[start]), stop - start);
+        sort(temp_col, start, stop);        
+        
     }
-
     
     *col_idx = temp_col;
 
-    for (int i = 0; i < links; i++)
+    for (int i = 0; i < links; i++){
         (*val)[i] = 1.0 / (double) temp[(*col_idx)[i]];
+    }
 
     //printvec_d(*val, links);
-    //printvec_i(*col_idx, links);
+    //sprintvec_i(*col_idx, links);
     //printvec_i(*row_ptr, *N+1);
-
-  
     
+  
 }

@@ -90,6 +90,20 @@ void sort_inplace(int *a, int *b, size_t n)
     swap(&(b[min_idx]), &(b[i]));
 
   }
-  // for (i = 0; i < n; i++)
-  //   arr2[arr1[i]]
+  
+}
+
+void sort(int *arr, int start, int stop){
+    if (start > stop + 1){
+        int piv = arr[start], l = start + 1, r = stop;
+        while (l < r){
+            if (arr[l] <= piv)
+                l++;
+        else
+            swap(&arr[l], &arr[--r]);
+        }
+    swap(&arr[--l], &arr[start]);
+    sort(arr, start, l);
+    sort(arr, r, stop);
+    }
 }

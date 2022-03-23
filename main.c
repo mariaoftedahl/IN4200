@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     int n;
     char *filename = argv[1];   // filename of file containing webgraph
     double d = 1.0;
-    double epsilon = 0.000001;
+    double epsilon = atoi(argv[2]);
     double *scores = (double*)calloc(N, sizeof(double));
 
     int *row_ptr; int *col_idx; double *val;
