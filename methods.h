@@ -1,5 +1,6 @@
 #include <stdlib.h> // malloc and free.
 #include <stdio.h>  // printf
+#include <math.h>
 
 int zeros2D(double ***A, int n, int m)
 {
@@ -68,6 +69,7 @@ void swap(int* xp, int* yp)
     *xp = *yp;
     *yp = temp;
 }
+
 
 // Function to perform Selection Sort
 void sort_inplace(int *a, int *b, size_t n)

@@ -1,5 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+
+
 
 #include "methods.h"
 
@@ -43,6 +46,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
 
     // allocating some temporary arrays
     int *row_count = (int*)calloc(*N, sizeof(int));
+    int *col_count = (int*)calloc(*N, sizeof(int));
     int *temp_col = (int*)calloc(links, sizeof(int));
     int *temp_row = (int*)calloc(links, sizeof(int));
     int *temp = (int*)calloc(*N, sizeof(int));
@@ -59,6 +63,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
         if (outgoing_links != ingoing_links){
             temp[outgoing_links]++;
             row_count[ingoing_links+1]++;               // needed for row_ptr
+            col_count[outgoing_links]++;
             temp_col[i - self_links] = outgoing_links;                // needed for col_idx
             temp_row[i - self_links] = ingoing_links;                 // needed for val
             
@@ -69,6 +74,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
 
     }
     fclose(fp);  // closing the file
+
 
     // allocating row_ptr, col_idx and val
 
@@ -103,5 +109,6 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     //printvec_i(*col_idx, links);
     //printvec_i(*row_ptr, *N+1);
 
+  
     
 }
