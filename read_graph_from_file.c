@@ -88,35 +88,6 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
 
     printf("Updated number of links: %d\n", links);
 
-    // find number of dangling webpages
-    
-    int d_count = 0;
-    for (int i = 0; i < *N; i++){
-        if(col_count[i] == 0){
-            d_count++;
-        }
-    }
-
-    if(d_count > 0){
-        printf("Number of dangling webpages: %d\n", d_count);
-    } else{
-        printf("No dangling webpages.\n");
-    }
-
-    int *D = (int*)calloc(d_count, sizeof(int));
-
-    if(d_count > 0){
-        int idx_count = 0;
-        for (int i = 0; i < *N; i++){
-            if (col_count[i] == 0){
-            D[idx_count] = i;
-            idx_count++;
-            }
-        }
-    }
-
-    printvec_i(D, d_count);
-
     // filling row_ptr
     
     int count = 0;
@@ -140,9 +111,9 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
         (*val)[i] = 1.0 / (double) temp[(*col_idx)[i]];
     }
 
-    //printvec_d(*val, links);
-    //sprintvec_i(*col_idx, links);
     //printvec_i(*row_ptr, *N+1);
-    
+    //printvec_i(*col_idx, links);
+    //printvec_d(*val, links);
+
   
 }
