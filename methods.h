@@ -63,9 +63,16 @@ int printvec_i(int *y, int N)
     return 0;
 }
 
-void swap(int* xp, int* yp)
+void swap_i(int* xp, int* yp)
 {
     int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void swap_d(double* xp, double* yp)
+{
+    double temp = *xp;
     *xp = *yp;
     *yp = temp;
 }
@@ -86,8 +93,8 @@ void sort_inplace(int *a, int *b, size_t n)
 
     // Swap the found minimum element
     // with the first element
-    swap(&(a[min_idx]), &(a[i]));
-    swap(&(b[min_idx]), &(b[i]));
+    swap_i(&(a[min_idx]), &(a[i]));
+    swap_i(&(b[min_idx]), &(b[i]));
 
   }
   
@@ -100,9 +107,9 @@ void sort(int *arr, int start, int stop){
             if (arr[l] <= piv)
                 l++;
         else
-            swap(&arr[l], &arr[--r]);
+            swap_i(&arr[l], &arr[--r]);
         }
-    swap(&arr[--l], &arr[start]);
+    swap_i(&arr[--l], &arr[start]);
     sort(arr, start, l);
     sort(arr, r, stop);
     }

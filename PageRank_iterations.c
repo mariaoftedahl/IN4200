@@ -20,8 +20,8 @@ void PageRank_iterations(int N, int *row_ptr, int *col_idx, double *val, double 
 
     int i, j;
     int iter_count = 0;
-    double diff;
-    double iter_diff = 1.0; // making sure at least one iteration is done
+    //double iter_diff = 1.0; // making sure at least one iteration is done
+    double diff = 1;
     
     double *temp = (double*)calloc(N, sizeof(double));
     
@@ -29,11 +29,10 @@ void PageRank_iterations(int N, int *row_ptr, int *col_idx, double *val, double 
     for (i = 0; i < N; i++)
     scores[i] = 1.0 / (double) N;
 
-    
+    // finding dangling nodes
+
     int d_count = 0;
     int *D_temp = (int*)calloc(N, sizeof(int));
-
-    // finding dangling nodes
     
     for (i = 0; i < N; i++){
         D_temp[i] = 1;
@@ -43,57 +42,74 @@ void PageRank_iterations(int N, int *row_ptr, int *col_idx, double *val, double 
         D_temp[col_idx[i]] = 0;
     }
 
-    int *D_final = malloc(N*sizeof(int));
+    int *D = (int*)calloc(N, sizeof(int));
+
     for (i = 0; i < N; i++)
     if (D_temp[i] == 1){
-        D_final[d_count] = i;
+        D[d_count] = i;
         d_count++;
     }
 
     printf("Number of dangling webpages: %d\n", d_count);
+    //printvec_i(D, d_count);
 
-    free(D_temp);
+    double tmp_diff = 0;
 
-    //printvec_i(D_final, d_count);
+    double *new_scores = (double*)calloc(N, sizeof(double));
+    double *tmp;
+
+    double score_factor_1 = (1.0 - d) / ((double) N);
     
 
-    /*
-        int W = 0;
+    while (epsilon <= diff){
 
+        diff = 0;
+
+        double W = 0;
+        
         for (i = 0; i < d_count; i++){
-            W += scores[D_final[i]];
+            W += scores[D[i]];
         }
-
-        double score_factor = (d*W) / ((double) N);
-    */
-   
-    
-    // Iterative procedure
-    while(iter_diff > epsilon){
         
-        for (i = 0; i < N; i++){
-            temp[i] = 0.0;
+        
+        
+        double score_factor_2 = d*W / ((double) N);
+        double score_factor = score_factor_1 + score_factor_2;
+        
+
+        for (i = 0; i < N; i++) {
+
+            new_scores[i] = 0.0;
+            
             for (j = row_ptr[i]; j < row_ptr[i+1]; j++){
-                temp[i] += ((1 - d)/((double) N)) + d*val[j]*scores[col_idx[j]];
-                //temp[i] += ((1 - d)/((double) N)) + score_factor + d*val[j]*scores[col_idx[j]];
+                new_scores[i] += d*val[j]*scores[col_idx[j]];
             }
-    
+            new_scores[i] += score_factor;
+            
+            tmp_diff = fabs(new_scores[i] - scores[i]);
+
+            if (tmp_diff > diff){
+                diff = tmp_diff;
+            }
         }
+
         
-        for(i = 0; i < N; i++){
-            diff = fabs(scores[i] - temp[i]);
-            scores[i] = temp[i]; 
-        }
-
-        iter_diff = diff;
+        
+        
+        // swap pointers to scores and new_scores
+        tmp = new_scores;
+        new_scores = scores; // new_scores is set back to 1/N
+        scores = tmp; // scores will be the previous scores calculated
         //printvec_d(scores, N);
-
+        
         iter_count++;
         
     }
-
+    
+   
     printf("Number of iterations until convergence: %d\n", iter_count);
 
-    free(temp);
+    free(new_scores);
+    free(D);
         
 }
