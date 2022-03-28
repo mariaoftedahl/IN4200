@@ -1,18 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <omp.h>
 
-//#include "methods.h"
+#define CHUNKSIZE 1000
 
 /*
- * void function to rank the webpages
- * int N:         
+ * void function to get the scores of the webpages
+ * int N: number of webpages         
  * int *row_ptr:      
  * int *col_idx:
  * double *val:
- * double d:
- * double epsilon:
- * double *scores:
+ * double d: damping constabt
+ * double epsilon: stopping chriterion
+ * double *scores: array to store scores of the webpages
 */
 
 
@@ -60,9 +61,8 @@ void PageRank_iterations(int N, int *row_ptr, int *col_idx, double *val, double 
 
     double score_factor_1 = (1.0 - d) / ((double) N);
     
-
     while (epsilon <= diff){
-
+            
         diff = 0;
 
         double W = 0;
@@ -76,22 +76,24 @@ void PageRank_iterations(int N, int *row_ptr, int *col_idx, double *val, double 
         double score_factor_2 = d*W / ((double) N);
         double score_factor = score_factor_1 + score_factor_2;
         
+        int chunk = CHUNKSIZE;
+        #pragma omp for schedule(dynamic,chunk)
+            for (i = 0; i < N; i++) {
 
-        for (i = 0; i < N; i++) {
-
-            new_scores[i] = 0.0;
+                new_scores[i] = 0.0;
             
-            for (j = row_ptr[i]; j < row_ptr[i+1]; j++){
-                new_scores[i] += d*val[j]*scores[col_idx[j]];
-            }
-            new_scores[i] += score_factor;
+                for (j = row_ptr[i]; j < row_ptr[i+1]; j++){
+                    new_scores[i] += d*val[j]*scores[col_idx[j]];
+                }
+                new_scores[i] += score_factor;
             
-            tmp_diff = fabs(new_scores[i] - scores[i]);
+                tmp_diff = fabs(new_scores[i] - scores[i]);
 
-            if (tmp_diff > diff){
-                diff = tmp_diff;
+                if (tmp_diff > diff){
+                    diff = tmp_diff;
+                }
             }
-        }
+        
 
         
         

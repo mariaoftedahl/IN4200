@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
+#include <omp.h>
 
 /*
     The program now works for all files, just remember to change the value of d and epsilon
@@ -27,8 +29,15 @@ int main(int argc, char *argv[]) {
 
 
     read_graph_from_file(filename, &N, &row_ptr, &col_idx, &val);
+
+    clock_t begin = clock();
+
     PageRank_iterations(N, row_ptr, col_idx, val, d, epsilon, scores);
     top_n_webpages(N, scores, n);
+
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Execution time: %f\n ", time_spent);
 
     free(row_ptr);
     free(col_idx);
