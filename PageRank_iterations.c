@@ -3,115 +3,114 @@
 #include <math.h>
 #include <omp.h>
 
-#define CHUNKSIZE 1000
 
 /*
- * void function to get the scores of the webpages
- * int N: number of webpages         
- * int *row_ptr:      
- * int *col_idx:
- * double *val:
- * double d: damping constabt
- * double epsilon: stopping chriterion
- * double *scores: array to store scores of the webpages
+  void function to implement the PageRank algorithm to calculate the scores of the webpages
 */
 
 
 void PageRank_iterations(int N, int *row_ptr, int *col_idx, double *val, double d, double epsilon, double *scores){
 
-    int i, j;
-    int iter_count = 0;
-    //double iter_diff = 1.0; // making sure at least one iteration is done
-    double diff = 1;
-    
-    double *temp = (double*)calloc(N, sizeof(double));
-    
-    // Initial guess
-    for (i = 0; i < N; i++)
-    scores[i] = 1.0 / (double) N;
+    int iter_count = 0;         
+    double diff = 1;            // making sure at least one iteration is done
 
-    // finding dangling nodes
+    // finding dangling webpages and their indices
 
     int d_count = 0;
     int *D_temp = (int*)calloc(N, sizeof(int));
+    int *D = (int*)calloc(N, sizeof(int));
     
-    for (i = 0; i < N; i++){
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++){
         D_temp[i] = 1;
     }
-        
-    for (i = 0; i < row_ptr[N]; i++){
+
+    #pragma omp parallel for
+    for (int i = 0; i < row_ptr[N]; i++){
         D_temp[col_idx[i]] = 0;
     }
 
-    int *D = (int*)calloc(N, sizeof(int));
-
-    for (i = 0; i < N; i++)
-    if (D_temp[i] == 1){
-        D[d_count] = i;
-        d_count++;
+    for (int i = 0; i < N; i++){
+        if (D_temp[i] == 1){
+            D[d_count] = i;
+            d_count += 1;
+        }
     }
 
     printf("Number of dangling webpages: %d\n", d_count);
-    //printvec_i(D, d_count);
+    free(D_temp);
 
-    double tmp_diff = 0;
-
-    double *new_scores = (double*)calloc(N, sizeof(double));
-    double *tmp;
+    double temp_diff = 0;
 
     double score_factor_1 = (1.0 - d) / ((double) N);
-    
-    while (epsilon <= diff){
-            
+    double W;
+
+    double *Ax = (double*)calloc(N, sizeof(double));
+
+    // intial guess for the iterative procedure
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++){
+        Ax[i] = 1.0 / (double) N;
+    }
+
+    double temp_scores[N];
+
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++){
+        temp_scores[i] = Ax[i];
+    }
+
+    while (epsilon < diff){
+        
         diff = 0;
 
-        double W = 0;
-        
-        for (i = 0; i < d_count; i++){
-            W += scores[D[i]];
+        // matrix multiplication in CRS format
+        #pragma omp parallel for
+        for (int i = 0; i < N; i++){
+            Ax[i] = 0.0;
+            for (int j = row_ptr[i]; j < row_ptr[i+1]; j++){
+                Ax[i] += val[j] * temp_scores[col_idx[j]];
+            }
         }
-        
-        
-        
+
+        // calculating the scalar value W
+        W = 0.0;
+
+        #pragma omp parallel for reduction(+: W)
+        for (int i = 0; i < d_count; i++){
+            W += temp_scores[D[i]];
+        } 
+
         double score_factor_2 = d*W / ((double) N);
         double score_factor = score_factor_1 + score_factor_2;
-        
-        int chunk = CHUNKSIZE;
-        #pragma omp for schedule(dynamic,chunk)
-            for (i = 0; i < N; i++) {
 
-                new_scores[i] = 0.0;
-            
-                for (j = row_ptr[i]; j < row_ptr[i+1]; j++){
-                    new_scores[i] += d*val[j]*scores[col_idx[j]];
-                }
-                new_scores[i] += score_factor;
-            
-                tmp_diff = fabs(new_scores[i] - scores[i]);
+        // updating the score
+        #pragma omp parallel for reduction(max: diff)
+        for (int i = 0; i < N; i++){        
+            scores[i] = score_factor + d * Ax[i];
 
-                if (tmp_diff > diff){
-                    diff = tmp_diff;
-                }
+            // implementing stopping criterion
+            temp_diff = fabs(temp_scores[i] - scores[i]);
+
+            if (temp_diff > diff){
+                diff = temp_diff;
             }
-        
 
-        
-        
-        
-        // swap pointers to scores and new_scores
-        tmp = new_scores;
-        new_scores = scores; // new_scores is set back to 1/N
-        scores = tmp; // scores will be the previous scores calculated
-        //printvec_d(scores, N);
-        
+            temp_scores[i] = scores[i];
+
+        }   // end for loop
+
         iter_count++;
-        
-    }
+ 
+    } // end while loop
     
    
     printf("Number of iterations until convergence: %d\n", iter_count);
 
-    free(new_scores);
+
+    // freeing memory of temporary arrays
     free(D);
+    free(Ax);
+    
         
 }

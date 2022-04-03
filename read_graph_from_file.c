@@ -1,16 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-
-#include "methods.h"
 
 /*
- * void function to read a webgraph from txt-file
- * char *filename: 
- * int *N:        
- * int **row_ptr:      
- * int **col_idx:
- * double **val:
+    void function to read a webgraph from txt-file and build the corresponding hyperlink matrix in CRS format 
 */
 
 void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, double **val){
@@ -19,7 +11,7 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     FILE *fp;
     char buff[255];
 
-    size_t start, stop;
+    int start, stop;
 
     if (filename == NULL){
         printf("Provide filename.\n");
@@ -37,7 +29,6 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     printf("Number of nodes: %d\n", *N);
     printf("Number of links: %d\n", links);
 
-
     // tried to skip the 4th line in the txt-file. didnt find out how to do this without assigning chars
     char text1[15], text2[15];
     fscanf(fp, "%*s %s %s", text1, text2);
@@ -54,24 +45,24 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
     *col_idx = (int*)calloc(links, sizeof(int*));
     *val = (double*)calloc(links, sizeof(double*));
 
-    
-    // extracting the values needed from the txt.file
     int outgoing_links, ingoing_links, self_links;
     self_links = 0;
 
     for (int i; i < *N; i++){
         temp[i] = 0;
     }
-    
+
+
+    // extracting the values needed from the txt.file
     for (int i = 0; i < links; i++){
         fscanf(fp, "%d %d", &outgoing_links, &ingoing_links);
         
         if (outgoing_links != ingoing_links){
             temp[outgoing_links]++;
-            row_count[ingoing_links+1]++;               // needed for row_ptr
+            row_count[ingoing_links+1]++;               
             col_count[outgoing_links]++;
-            temp_col[i - self_links] = outgoing_links;                // needed for col_idx
-            temp_row[i - self_links] = ingoing_links;                 // needed for val 
+            temp_col[i - self_links] = outgoing_links;               
+            temp_row[i - self_links] = ingoing_links;                
             
         }
         else{
@@ -97,23 +88,30 @@ void read_graph_from_file(char *filename, int *N, int **row_ptr, int **col_idx, 
         (*row_ptr)[i] = count;
     }
     
-    sort_inplace(temp_row, temp_col, links);
+    // filling col_idx and val
+
+    int *counter = (int*)calloc(*N, sizeof(int));
+
+    for (int i = 0; i < *N; i++)
+        counter[i] = 0;
     
-    for (int i = 0; i < *N; i++) {
-        start = (*row_ptr)[i], stop = (*row_ptr)[i+1];
-        sort(temp_col, start, stop);        
-        
-    }
-    
-    *col_idx = temp_col;
 
-    for (int i = 0; i < links; i++){
-        (*val)[i] = 1.0 / (double) temp[(*col_idx)[i]];
+    int idx;
+    for (int i = 0; i < links; i++){   
+        idx = (*row_ptr)[temp_row[i]] + counter[temp_row[i]];
+        (*col_idx)[idx] = temp_col[i];
+
+        counter[temp_row[i]] += 1;
+        (*val)[idx] = 1.0/(col_count[temp_col[i]]);
     }
 
-    //printvec_i(*row_ptr, *N+1);
-    //printvec_i(*col_idx, links);
-    //printvec_d(*val, links);
+    // freeing memory of temporary arrays
 
+    free(counter);
+    free(row_count);
+    free(col_count);
+    free(temp);
+    free(temp_col);
+    free(temp_row);
   
 }
