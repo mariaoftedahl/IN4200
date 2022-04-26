@@ -34,5 +34,6 @@ int main (int argc, char *argv[])
 	new_chars[i*(width*comp)+j*comp+k]=image_chars[i*(width*comp)+(width-j-1)*comp+k];
 
   export_JPEG_file ("flipped_image.jpg", new_chars, height, width, comp, 75);
+  
   return 0;
 }
