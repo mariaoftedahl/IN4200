@@ -1,5 +1,5 @@
 CC = mpicc
-FLAGS = -O2
+FLAGS = -O2 -Wall
 LDFLAGS = -L../simple-jpeg/ -lsimplejpeg
 
 PROJ 			= parallel_main
