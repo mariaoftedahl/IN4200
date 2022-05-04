@@ -12,6 +12,8 @@ typedef struct{
 }
 image;
 
+/* declaring functions */
+
 void allocate_image(image *u, int m, int n);
 void deallocate_image(image *u);
 void convert_jpeg_to_image(const unsigned char* image_chars, image *u);

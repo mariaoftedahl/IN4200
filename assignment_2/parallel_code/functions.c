@@ -1,9 +1,7 @@
 #include "functions.h"
 
 
-/*
-    Swap two pointers
-*/
+/* Swap two pointers */
 
 void swap(void** a, void** b) {
     void* temp = *a;
@@ -11,9 +9,8 @@ void swap(void** a, void** b) {
     *b = temp;
 }
 
-/*
-    Allocate 2D array image_data inside u, when m and n are given as input. 
-*/
+/* Allocate 2D array image_data inside u, when m and n are given as input. */
+
 void allocate_image(image *u, int m, int n){
     u->m = m;
     u->n = n;
@@ -27,20 +24,16 @@ void allocate_image(image *u, int m, int n){
 }
    
 
-/*
-    Free storage used by the 2D array image_data inside u
-*/
+/* Free storage used by the 2D array image_data inside u */
+
 void deallocate_image(image *u){
-    
     
     free(u->image_data[0]);
     free(u->image_data);
     
 }
 
-/*
-    Convert jpg to image
-*/
+/* Convert jpg to image */
 
 void convert_jpeg_to_image(const unsigned char* image_chars, image *u){
 
@@ -54,9 +47,7 @@ void convert_jpeg_to_image(const unsigned char* image_chars, image *u){
     
 }
 
-/*
-    Convert image to jpg
-*/
+/* Convert image to jpg */
 
 void convert_image_to_jpeg(const image *u, unsigned char* image_chars){
 
@@ -68,9 +59,7 @@ void convert_image_to_jpeg(const image *u, unsigned char* image_chars){
 
 }
 
-/*
-    Denoising algorithm with MPI communcation calls
-*/
+/* Denoising algorithm with MPI communcation calls */
 
 void iso_diffusion_denoising_parallel(image *u, image *u_bar, float kappa, int iters, int my_rank, int num_procs){
     

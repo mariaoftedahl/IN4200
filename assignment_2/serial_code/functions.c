@@ -1,9 +1,7 @@
 #include "functions.h"
 
 
-/*
-    Swap two pointers
-*/
+/* Swap two pointers */
 
 void swap(void** a, void** b) {
     void* temp = *a;
@@ -11,9 +9,8 @@ void swap(void** a, void** b) {
     *b = temp;
 }
 
-/*
-    Allocate 2D array image_data inside u, when m and n are given as input. 
-*/
+/* Allocate 2D array image_data inside u, when m and n are given as input. */
+
 void allocate_image(image *u, int m, int n){
     u->m = m;
     u->n = n;
@@ -27,20 +24,16 @@ void allocate_image(image *u, int m, int n){
 }
    
 
-/*
-    Free storage used by the 2D array image_data inside u
-*/
+/* Free storage used by the 2D array image_data inside u */
+
 void deallocate_image(image *u){
-    
     
     free(u->image_data[0]);
     free(u->image_data);
     
 }
 
-/*
-    Convert jpg to image
-*/
+/* Convert jpg to image */
 
 void convert_jpeg_to_image(const unsigned char* image_chars, image *u){
 
@@ -54,11 +47,7 @@ void convert_jpeg_to_image(const unsigned char* image_chars, image *u){
     
 }
 
-/*
-    Convert image to jpg
-*/
-
-
+/* Convert image to jpg */
 
 void convert_image_to_jpeg(const image *u, unsigned char* image_chars){
 
@@ -70,7 +59,7 @@ void convert_image_to_jpeg(const image *u, unsigned char* image_chars){
 
 }
 
-
+/* Denoising algorithm */
 
 void iso_diffusion_denoising(image *u, image *u_bar, float kappa, int iters){
 
@@ -104,7 +93,7 @@ void iso_diffusion_denoising(image *u, image *u_bar, float kappa, int iters){
             
     }
 
-    swap((void*)&u, (void*)&u_bar);
+    swap((void*)&u, (void*)&u_bar); // swapping back since this should not be done for the last iteration
 
 }
 

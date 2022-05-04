@@ -111,7 +111,9 @@ int main(int argc, char *argv[]){
         export_JPEG_file(output_jpeg_filename, image_chars, m, n, c, 75);
         free(image_chars);
     }
-    
+
+
+    // freeing memory
     free(displs);
     free(send_counts);
     deallocate_image(&u);
