@@ -91,7 +91,16 @@ int main(int argc, char *argv[]){
     allocate_image(&u_bar, my_m, my_n);
     convert_jpeg_to_image(my_image_chars, &u);
 
+    // check the speedup with MPI implemented
+    double t1 = MPI_Wtime();
+    
+    
     iso_diffusion_denoising_parallel(&u, &u_bar, kappa, iters, my_rank, num_procs);
+    double t2 = MPI_Wtime();
+    if (my_rank==0){
+        printf("Execution time with %d processes: %f seconds\n", num_procs, t2-t1);
+    }
+
     convert_image_to_jpeg(&u_bar, my_image_chars);
   
     // gathering chunks of my_image_chars (after denoising) in image_chars again

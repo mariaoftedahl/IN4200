@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <time.h>
 
 /* declarations of functions import_JPEG_file and export_JPEG_file */
 
@@ -18,15 +19,17 @@ int main(int argc, char *argv[]){
     image u, u_bar;
     unsigned char *image_chars;
 
-    /* read from command line: kappa, iters, input_jpeg_filename, output_jpeg_filename */
-
     import_JPEG_file(input_jpeg_filename, &image_chars, &m, &n, &c);
 
     allocate_image(&u, m, n);
     allocate_image(&u_bar, m, n);
     convert_jpeg_to_image(image_chars, &u);
 
+    clock_t begin = clock();
     iso_diffusion_denoising (&u, &u_bar, kappa, iters);
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Execution time: %f seconds\n", time_spent);
 
     convert_image_to_jpeg (&u_bar, image_chars);
     export_JPEG_file(output_jpeg_filename, image_chars, m, n, c, 75);

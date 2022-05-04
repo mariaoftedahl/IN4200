@@ -74,7 +74,6 @@ void convert_image_to_jpeg(const image *u, unsigned char* image_chars){
 
 void iso_diffusion_denoising_parallel(image *u, image *u_bar, float kappa, int iters, int my_rank, int num_procs){
     
-    // Boundary conditions
     // Each process initializes u_bar
     
     for(size_t i = 0; i < u->m; i++){
@@ -143,7 +142,7 @@ void iso_diffusion_denoising_parallel(image *u, image *u_bar, float kappa, int i
             }
         }
         swap((void*)&u, (void*)&u_bar);
-    } // end iterations
+    } // end denoising iterations
     swap((void*)&u, (void*)&u_bar); // swapping back since it should not be done on last iteration
 
 }
