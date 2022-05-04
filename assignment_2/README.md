@@ -4,7 +4,7 @@ The goal of this assignment is the compilation of existing implementations of C 
 
 ### Serial code
 
-The [serial_code folder](https://github.com/mariaoftedahl/IN4200/tree/main/assignment_2/serial_code) contains the serial implementation of the algorithm, with a main program, a program containing the functions used, a header file, a Makefile, a noisy grey-scale image and an external library for reading and writing JPEG images (this is not included in the final delivery). The main program [serial_main.c](https://github.com/mariaoftedahl/IN4200/blob/main/assignment_2/serial_code/serial_main.c) takes four input arguments:
+The [serial_code folder](https://github.com/mariaoftedahl/IN4200/tree/main/assignment_2/serial_code) contains the serial implementation of the algorithm, with a main program, a program containing the functions used, a header file, a Makefile and a noisy grey-scale image. The main program [serial_main.c](https://github.com/mariaoftedahl/IN4200/blob/main/assignment_2/serial_code/serial_main.c) takes four input arguments:
 
 * input_jpeg_filename: greyscale image to be denoised in jpg-format
 * output_jpeg_filename: chosen filename for denoised image in jpg-format
